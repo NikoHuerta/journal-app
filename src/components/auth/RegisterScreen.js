@@ -30,6 +30,7 @@ export const RegisterScreen = () => {
                     name="password"
                     className="auth__input"
                 />
+                
 
                 <input 
                     type="password"
