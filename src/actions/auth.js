@@ -1,4 +1,6 @@
-import { getAuth, signInWithPopup, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword } from 'firebase/auth';
+import Swal from 'sweetalert2';
+
+import { getAuth, signInWithPopup, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { googleAuthProvider } from "../firebase/firebaseConfig";
 import { types } from "../types/types"
 import { finishLoading, startLoading } from './ui';
@@ -18,8 +20,11 @@ export const startLoginEmailPassword = (email, password) => {
                 dispatch(finishLoading());
             })
             .catch(e => {
-                console.log(e);
                 dispatch(finishLoading());
+                let msg_err;
+                ((e.code ==='auth/user-not-found') || (e.code ==='auth/wrong-password')) ? msg_err= 'You have entered an invalid username or password, or your account does not exist' : msg_err = 'Service error';
+                Swal.fire('Error', msg_err, 'error');
+
             });
     }
 }
@@ -38,7 +43,9 @@ export const startRegisterWithEmailPasswordName = (email, password, name) => {
                 );
             })
             .catch(e => {
-                console.log(e);
+                let msg_err;
+                (e.code ==='auth/email-already-in-use') ? msg_err= 'The email address is already in use by another account.' : msg_err = 'Service internal error.';
+                Swal.fire('Error', msg_err, 'error');
             });
 
     }
@@ -46,14 +53,34 @@ export const startRegisterWithEmailPasswordName = (email, password, name) => {
 
 
 export const startGoogleLogin = () => {
+
     return(dispatch) => {
+        dispatch(startLoading());
+
         const auth = getAuth();
         signInWithPopup(auth, googleAuthProvider)
             .then( ({ user }) => {
                 dispatch(
                     login(user.uid, user.displayName)
-                )
-                // console.log(user);
+                );
+                dispatch(finishLoading());
+            })
+            .catch(e => {
+                Swal.fire('Error', 'The Google Login PopUp was closed.', 'error');
+                dispatch(finishLoading());
+            });
+    }
+}
+
+export const startLogout = () => {
+    return (dispatch) => {
+        const auth = getAuth();
+        signOut(auth)
+            .then( ( ) => {
+                dispatch(logout());
+            })
+            .catch( e => {
+                console.log(e);
             });
     }
 }
@@ -65,6 +92,11 @@ export const login = (uid, displayName) => ({
             uid,
             displayName
         }
+});
+
+
+export const logout = () => ({
+    type: types.logout
 });
 
 

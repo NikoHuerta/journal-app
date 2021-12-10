@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import validator from 'validator';
+// import Swal from 'sweetalert2';
 
 import { useForm } from '../../hooks/useForm';
 import { removeError, setError } from '../../actions/ui';
@@ -32,6 +33,10 @@ export const RegisterScreen = () => {
         }
     };
 
+    // const handleError = (msg) => {
+    //     Swal.fire('Error',  msg , 'warning');
+    // };
+
     const isFormValid = () => {
 
         if(name.trim().length === 0){
@@ -57,10 +62,11 @@ export const RegisterScreen = () => {
             <form onSubmit={ handleRegister } >
 
                 {
-                    msgError &&
+                    msgError && //handleError(msgError)
                     (<div className="auth__alert-error">
                         { msgError }
                     </div>)
+                    
                 }
 
 
