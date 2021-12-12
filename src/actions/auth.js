@@ -4,6 +4,7 @@ import { getAuth, signInWithPopup, createUserWithEmailAndPassword, updateProfile
 import { googleAuthProvider } from "../firebase/firebaseConfig";
 import { types } from "../types/types"
 import { finishLoading, startLoading } from './ui';
+import { logoutNote } from './notes';
 
 
 export const startLoginEmailPassword = (email, password) => {
@@ -78,6 +79,7 @@ export const startLogout = () => {
         signOut(auth)
             .then( ( ) => {
                 dispatch(logout());
+                dispatch(logoutNote());
             })
             .catch( e => {
                 console.log(e);
