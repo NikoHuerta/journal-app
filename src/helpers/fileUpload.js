@@ -20,7 +20,7 @@ export const fileUpload = async (file) => {
         }
 
     } catch (error) {
-        throw error;
+        return null;
     }
 
     // return url img
