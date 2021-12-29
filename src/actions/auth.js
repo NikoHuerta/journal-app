@@ -13,15 +13,16 @@ export const startLoginEmailPassword = (email, password) => {
         dispatch(startLoading());
 
         const auth = getAuth();
-        signInWithEmailAndPassword(auth, email, password)
+        // console.log(auth);
+
+        return signInWithEmailAndPassword(auth, email, password)
             .then( ({user}) => {
-                dispatch(
-                    login(user.uid, user.displayName)
-                );
+                dispatch(login(user.uid, user.displayName));
                 dispatch(finishLoading());
             })
             .catch(e => {
                 dispatch(finishLoading());
+                //console.log(e);
                 let msg_err;
                 ((e.code ==='auth/user-not-found') || (e.code ==='auth/wrong-password')) ? msg_err= 'You have entered an invalid username or password, or your account does not exist' : msg_err = 'Service error';
                 Swal.fire('Error', msg_err, 'error');
@@ -30,28 +31,25 @@ export const startLoginEmailPassword = (email, password) => {
     }
 }
 
-
 export const startRegisterWithEmailPasswordName = (email, password, name) => {
     return (dispatch) => {
         const auth = getAuth();
-        createUserWithEmailAndPassword(auth, email, password)
+        return createUserWithEmailAndPassword(auth, email, password)
             .then( async ({ user }) => {
 
-                await updateProfile(user, { displayName: name });
-                
-                dispatch(
-                    login(user.uid, user.displayName)
-                );
+                await updateProfile(user, { displayName: name });                
+                dispatch(login(user.uid, user.displayName));
             })
             .catch(e => {
+                
                 let msg_err;
                 (e.code ==='auth/email-already-in-use') ? msg_err= 'The email address is already in use by another account.' : msg_err = 'Service internal error.';
                 Swal.fire('Error', msg_err, 'error');
+                return msg_err;
             });
 
     }
 }
-
 
 export const startGoogleLogin = () => {
 
@@ -59,7 +57,7 @@ export const startGoogleLogin = () => {
         dispatch(startLoading());
 
         const auth = getAuth();
-        signInWithPopup(auth, googleAuthProvider)
+        return signInWithPopup(auth, googleAuthProvider)
             .then( ({ user }) => {
                 dispatch(
                     login(user.uid, user.displayName)
@@ -69,6 +67,7 @@ export const startGoogleLogin = () => {
             .catch(e => {
                 Swal.fire('Error', 'The Google Login PopUp was closed.', 'error');
                 dispatch(finishLoading());
+                return e.code;
             });
     }
 }
@@ -76,7 +75,8 @@ export const startGoogleLogin = () => {
 export const startLogout = () => {
     return (dispatch) => {
         const auth = getAuth();
-        signOut(auth)
+        //console.log(auth);
+        return signOut(auth)
             .then( ( ) => {
                 dispatch(logout());
                 dispatch(logoutNote());
@@ -87,7 +87,6 @@ export const startLogout = () => {
     }
 }
 
-
 export const login = (uid, displayName) => ({
         type: types.login,
         payload: {
@@ -95,7 +94,6 @@ export const login = (uid, displayName) => ({
             displayName
         }
 });
-
 
 export const logout = () => ({
     type: types.logout
